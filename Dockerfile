@@ -1,8 +1,14 @@
 FROM debian:buster
 
 
+ENV SSP_VERSION 1.3
+ENV SSP_PACKAGE ltb-project-self-service-password
+
+
 ARG DEBIAN_FRONTEND=noninteractive
 
+# https://ltb-project.org/documentation/self-service-password
+# https://github.com/openfrontier/docker-ldap-ssp
 # https://linuxize.com/post/how-to-install-apache-on-debian-10/
 # https://www.linode.com/docs/security/ssl/ssl-apache2-debian-ubuntu/
 # https://www.linode.com/docs/security/ssl/create-a-self-signed-tls-certificate/
@@ -25,9 +31,9 @@ RUN \
     a2enmod ssl && \
     a2dissite *default && \
     a2ensite ssp-site.conf && \
-    curl -L https://ltb-project.org/archives/ltb-project-self-service-password-1.3.tar.gz -o ssp.tar.gz  && \
+    curl -L https://ltb-project.org/archives/${SSP_PACKAGE}-${SSP_VERSION}.tar.gz -o ssp.tar.gz  && \
     tar xf ssp.tar.gz -C /var/www/html && rm -f ssp.tar.gz && \
-    mv /var/www/html/ltb-project-self-service-password-1.3 /var/www/html/ssp && \
+    mv /var/www/html/${SSP_PACKAGE}-${SSP_VERSION} /var/www/html/ssp && \
     chown -R www-data:www-data /var/www/html/ssp && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
