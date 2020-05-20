@@ -1,9 +1,12 @@
 FROM debian:buster
 
 
+ENV HTTPS_CERT "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+ENV HTTPS_KEY  "/etc/ssl/private/ssl-cert-snakeoil.key"
+
+
 ENV SSP_VERSION 1.3
 ENV SSP_PACKAGE ltb-project-self-service-password
-
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -24,10 +27,13 @@ RUN \
     apt-get install -q -y apache2 libapache2-mod-php php-mbstring php-curl php-ldap
 
 COPY ssp-site.conf /etc/apache2/sites-available/
+COPY docker-entrypoint.sh /
 
 RUN \
     chown root:root /etc/apache2/sites-available/ssp-site.conf && \
     chmod 644 /etc/apache2/sites-available/ssp-site.conf && \
+    chown root:root /docker-entrypoint.sh && \
+    chmod 744 /docker-entrypoint.sh && \
     a2enmod ssl && \
     a2dissite *default && \
     a2ensite ssp-site.conf && \
@@ -41,4 +47,4 @@ RUN \
 EXPOSE 443
 WORKDIR /var/www/html/
 
-CMD ["apache2ctl","-D","FOREGROUND"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
